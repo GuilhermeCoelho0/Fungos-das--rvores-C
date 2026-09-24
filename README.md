@@ -92,24 +92,37 @@ Dessa forma, o dataset permite comparar o comportamento das estruturas de árvor
 
 ## 2.1 Estrutura(s)
 
-As estruturas de árvore implementadas pelo grupo serão definidas nesta seção.
+2.1 Estrutura(s)
 
-> **Status:** 🚧 A definir / implementação para a próxima etapa.
+Serão utilizadas duas estruturas de árvore para organização dos registros do dataset:
+
+Árvore Binária de Busca (BST — Binary Search Tree);
+Árvore AVL (Adelson-Velsky e Landis).
+
 
 ---
 
 ## 2.2 Justificativa Técnica
 
-A justificativa técnica das estruturas escolhidas será apresentada considerando:
+2.2 Justificativa Técnica
 
-* Complexidade assintótica;
-* Balanceamento;
-* Volume de dados;
-* Características do dataset;
-* Casos de uso;
-* Comportamento nos diferentes cenários de teste.
+A escolha da BST e da AVL está relacionada principalmente ao volume do dataset e à necessidade de analisar o comportamento das árvores em diferentes condições de entrada.
 
-> **Status:** 🚧 A definir.
+A BST possui uma estrutura relativamente simples e organiza os registros de acordo com a chave gbifID. Quando a árvore apresenta uma distribuição equilibrada, as operações de busca, inserção e remoção podem apresentar complexidade média de O(log n). Entretanto, uma BST não balanceada pode atingir uma altura próxima de n, fazendo com que essas operações apresentem complexidade de O(n) no pior caso.
+
+Esse comportamento é especialmente relevante para o projeto porque permite testar situações com registros organizados em ordem crescente ou decrescente, possibilitando observar o impacto da distribuição dos dados sobre a estrutura.
+
+A AVL, por outro lado, mantém a árvore balanceada por meio de rotações após determinadas operações. Seu objetivo é manter a altura da árvore em ordem logarítmica em relação ao número de elementos, evitando que a estrutura se transforme em uma árvore linear.
+
+A escolha conjunta das duas estruturas permite analisar a diferença entre:
+
+uma árvore de busca que não possui balanceamento automático, representada pela BST;
+uma árvore de busca auto-balanceada, representada pela AVL.
+
+Essa comparação é adequada ao dataset porque o conjunto possui potencial para conter centenas de milhares de registros. Dessa forma, alterações na altura da árvore podem ter impacto significativo no número de comparações necessárias para localizar ou modificar um registro.
+
+Além disso, a comparação entre BST e AVL possibilita relacionar os resultados dos testes práticos com suas respectivas complexidades assintóticas e observar como o balanceamento influencia o comportamento das operações.
+
 
 ---
 
@@ -132,15 +145,31 @@ As operações previstas para a implementação são:
 
 ## 2.4 Complexidade
 
-A tabela abaixo será preenchida de acordo com as estruturas efetivamente implementadas.
+2.4 Complexidade
 
-| Operação | Melhor caso | Caso médio | Pior caso |
-| -------- | ----------: | ---------: | --------: |
-| Inserção |           — |          — |         — |
-| Busca    |           — |          — |         — |
-| Remoção  |           — |          — |         — |
+A complexidade teórica das operações de inserção, busca e remoção depende da estrutura utilizada e, no caso da BST, principalmente da altura da árvore.
 
-> **Status:** 🚧 A preencher após a definição das estruturas.
+BST
+Operação	Melhor caso	Caso médio	Pior caso
+Inserção	O(1)	O(log n)	O(n)
+Busca	O(1)	O(log n)	O(n)
+Remoção	O(1)	O(log n)	O(n)
+
+Na BST, o melhor caso ocorre quando a operação encontra diretamente a posição necessária ou quando a árvore possui uma configuração favorável. No caso médio, considerando uma distribuição aproximadamente equilibrada, as operações apresentam comportamento O(log n). No pior caso, a árvore pode ficar degenerada, com altura próxima de n, levando as operações para O(n).
+
+AVL
+Operação	Melhor caso	Caso médio	Pior caso
+Inserção	O(1)	O(log n)	O(log n)
+Busca	O(1)	O(log n)	O(log n)
+Remoção	O(1)	O(log n)	O(log n)
+
+Na AVL, o balanceamento mantém a altura da árvore em ordem O(log n). Dessa forma, as operações de busca, inserção e remoção possuem limite assintótico O(log n) no pior caso.
+
+Complexidade	Ideia simples
+O(1)	Não depende do tamanho dos dados
+O(log n)	Cresce muito lentamente
+O(n)	Cresce proporcionalmente aos dados
+
 
 ---
 
@@ -148,46 +177,67 @@ A tabela abaixo será preenchida de acordo com as estruturas efetivamente implem
 
 ## 3.1 Objetivo dos Testes
 
-Os testes terão como objetivo validar:
+3.1 Objetivo dos Testes
 
-* A **corretude** das operações das árvores;
-* O comportamento das estruturas com diferentes volumes de dados;
-* O desempenho das operações;
-* O comportamento em casos extremos;
-* A quantidade de comparações realizadas;
-* A altura das árvores;
-* As rotações, quando aplicável;
-* O comportamento das estruturas em diferentes cenários de entrada.
+Os testes terão como objetivo verificar a corretude das estruturas de árvore e analisar seu comportamento diante de diferentes formas de entrada.
+
+Serão considerados os seguintes objetivos:
+
+Verificar se os registros são inseridos corretamente;
+Verificar se registros podem ser localizados pela chave gbifID;
+Verificar o comportamento das operações de remoção;
+Avaliar o comportamento das árvores com diferentes distribuições de dados;
+Verificar o comportamento com dados em ordem crescente e decrescente;
+Verificar o tratamento de registros duplicados;
+Avaliar casos extremos, como árvores vazias e árvores contendo apenas um elemento;
+Observar a altura das estruturas;
+Contabilizar o número de comparações realizadas;
+Verificar, na AVL, o comportamento relacionado ao balanceamento e às rotações.
+
+Os testes também permitirão posteriormente relacionar o comportamento observado nas execuções com as complexidades assintóticas teóricas das estruturas BST e AVL.
+
 
 ---
 
 ## 3.2 Cenários de Teste
 
-|  # | Cenário              | Entrada                                   | Resultado esperado                             | Status |
-| -: | -------------------- | ----------------------------------------- | ---------------------------------------------- | :----: |
-|  1 | Dados aleatórios     | Registros de fungos em ordem aleatória    | Estrutura construída corretamente              |    ☐   |
-|  2 | Dados ordenados      | Registros organizados por chave           | Avaliar comportamento da árvore                |    ☐   |
-|  3 | Dados duplicados     | Registros com chaves repetidas            | Validar comportamento definido para duplicatas |    ☐   |
-|  4 | Operações misturadas | Inserções, buscas e remoções intercaladas | Operações executadas corretamente              |    ☐   |
+3.2 Cenários de Teste
+
+Além dos diferentes tipos e volumes de dados, serão considerados três cenários relacionados às condições de utilização do computador durante a execução dos testes. O objetivo é observar se a carga de trabalho do sistema influencia o tempo de execução das operações realizadas pelas estruturas de árvore.
+
+|  #  | Cenário                            | Entrada / Condição do sistema                                                                                                                                                                                                 | Resultado esperado                                                                                                      | Status |
+| :-: | :--------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------- | :----: |
+|  1  | **Baixa utilização do sistema**    | Execução do teste logo após a inicialização do computador, com o mínimo possível de programas e processos adicionais em execução.                                                                                             | Obter uma referência de desempenho com baixa utilização dos recursos do computador.                                     |    ☐   |
+|  2  | **Utilização moderada do sistema** | Execução do teste após o computador ter sido utilizado normalmente por algum período, com programas e processos comuns em execução.                                                                                           | Verificar a variação do desempenho das operações em uma condição de utilização moderada dos recursos.                   |    ☐   |
+|  3  | **Alta utilização do sistema**     | Execução do teste enquanto o computador estiver executando diversas tarefas simultaneamente, como várias abas do navegador, programas em segundo plano ou processos de maior consumo de recursos, como renderização de vídeo. | Verificar o comportamento e a variação do tempo de execução das operações sob maior utilização dos recursos do sistema. |    ☐   |
+
+
+
 
 ---
 
 ## 3.3 Casos Extremos (Edge Cases)
 
-Serão considerados casos como:
+3.3 Casos Extremos (Edge Cases)
 
-* 🌱 Árvore vazia;
-* 1️⃣ Árvore contendo apenas um elemento;
-* 🔁 Dados duplicados;
-* ⬆️ Dados em ordem crescente;
-* ⬇️ Dados em ordem decrescente;
-* 📦 Volume máximo do dataset;
-* 🔎 Busca por elemento existente;
-* ❌ Busca por elemento inexistente;
-* 🗑️ Remoção de elemento existente;
-* ❌ Tentativa de remoção de elemento inexistente.
+Serão considerados os seguintes casos extremos:
 
-Os dados em ordem crescente ou decrescente serão especialmente importantes para avaliar o **pior caso de uma BST não balanceada**.
+🌱 Árvore vazia: verificar o comportamento das operações quando nenhum registro foi inserido;
+1️⃣ Árvore com um único elemento: verificar inserção, busca e remoção de um único registro;
+🔁 Dados duplicados: verificar o comportamento quando existem registros com a mesma chave gbifID;
+⬆️ Dados em ordem crescente: inserir registros com gbifID em ordem crescente para observar o comportamento da BST e o balanceamento da AVL;
+⬇️ Dados em ordem decrescente: inserir registros com gbifID em ordem decrescente para observar o comportamento da BST e o balanceamento da AVL;
+📦 Grande volume de dados: utilizar o maior conjunto de registros previsto para verificar o comportamento das estruturas em grande escala;
+🔎 Busca de elemento existente: verificar se um registro presente é encontrado corretamente;
+❌ Busca de elemento inexistente: verificar se a estrutura identifica corretamente a ausência do registro;
+🗑️ Remoção de elemento existente: verificar a remoção de registros presentes na árvore;
+❌ Remoção de elemento inexistente: verificar se a estrutura permanece consistente quando se tenta remover uma chave inexistente.
+
+Os dados em ordem crescente e decrescente são especialmente relevantes para a BST, pois podem produzir uma árvore altamente desbalanceada e aproximar seu comportamento do pior caso O(n).
+
+Na AVL, esses mesmos cenários permitem verificar a capacidade de manutenção do balanceamento por meio das rotações.
+
+
 
 ---
 
