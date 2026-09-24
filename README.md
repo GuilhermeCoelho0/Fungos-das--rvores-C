@@ -13,8 +13,8 @@
 | ------------------------------- | ---------: |
 | **Guilherme Coelho**            |   42966515 |
 | **Maria Luisa Assunção Novaes** |   42802881 |
-| **Thiago Salles**               |   43461905 |
 | **Miguel Targino**              |   43079067 |
+| **Thiago Salles**               |   43461905 |
 
 ---
 
