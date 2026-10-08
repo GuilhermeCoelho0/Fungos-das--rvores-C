@@ -59,7 +59,7 @@ Serão utilizados os principais atributos disponíveis nos registros para repres
 | `country`        | String  | País onde a ocorrência foi registrada         |
 | `latitude`       | Float   | Latitude da ocorrência                        |
 | `longitude`      | Float   | Longitude da ocorrência                       |
-| `year`           | Inteiro | Ano associado ao registro                     |
+| `year`           | Inteiro | Ano do registro                     |
 
 O campo **`gbifID`** será utilizado como **chave principal** para as operações de inserção, busca e remoção.
 
