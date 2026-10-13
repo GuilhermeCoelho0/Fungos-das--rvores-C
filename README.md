@@ -49,42 +49,28 @@ Serão utilizados os principais atributos disponíveis nos registros para repres
 | ---------------- | ------- | --------------------------------------------- |
 | `gbifID`         | Inteiro | Identificador único do registro de ocorrência |
 | `scientificName` | String  | Nome científico do organismo                  |
-| `kingdom`        | String  | Reino taxonômico                              |
+| `kingdom`        | String  | Classificação taxonômica                      |
 | `phylum`         | String  | Filo                                          |
 | `class`          | String  | Classe                                        |
 | `order`          | String  | Ordem                                         |
 | `family`         | String  | Família                                       |
 | `genus`          | String  | Gênero                                        |
-| `species`        | String  | Espécie, quando disponível                    |
+| `species`        | String  | Espécie, se disponível                        |
 | `country`        | String  | País onde a ocorrência foi registrada         |
 | `latitude`       | Float   | Latitude da ocorrência                        |
 | `longitude`      | Float   | Longitude da ocorrência                       |
-| `year`           | Inteiro | Ano do registro                     |
+| `year`           | Inteiro | Ano do registro                               |
 
-O campo **`gbifID`** será utilizado como **chave principal** para as operações de inserção, busca e remoção.
+Para atender ao requisito de chave composta, as operações de inserção, busca e remoção utilizarão uma chave formada pela combinação dos campos (scientificName, year, gbifID). O comparador examinará os campos na seguinte ordem: primeiro scientificName, lexicográfica, year (em ordem numérica) e gbifID. O resultado do comparador será negativo quando a primeira chave vier antes da segunda, zero quando todos os componentes forem iguais e positivo quando vier depois.
 
-Também serão realizados testes utilizando atributos textuais, como **`scientificName`**, para avaliar comparações entre strings.
+A mesma função de comparação será utilizada pela BST e pela AVL, garantindo que as duas estruturas apliquem exatamente a mesma regra. Uma chave será considerada repetida somente quando os três componentes forem iguais. O gbifID isolado poderá continuar armazenado como atributo do registro, mas não será usado sozinho como chave de comparação do projeto. Nos testes de duplicidade, serão criadas cópias artificiais de registros para forçar a repetição da mesma chave composta. A regra adotada será rejeitar a inserção quando a chave já existir, sem criar um segundo nó. Registros com scientificName ou year iguais, mas com outro gbifID, serão considerados chaves diferentes.
+
 
 ---
 
 ## 1.4 Justificativa da Escolha
 
-O dataset de fungos foi escolhido por atender aos principais requisitos do projeto de **Estruturas de Dados II**.
-
-O GBIF disponibiliza uma grande quantidade de registros de ocorrência, permitindo trabalhar com datasets entre **50 mil e 1 milhão de registros**, conforme solicitado no projeto.
-
-Além do grande volume, os registros possuem diversos atributos e diferentes tipos de dados, como **inteiros, strings e valores de ponto flutuante**. Isso permite representar um cenário mais próximo de uma aplicação real e exige a implementação de comparadores para os registros.
-
-A grande quantidade de registros também permite avaliar o comportamento das estruturas de árvore em diferentes tamanhos de entrada e cenários de teste, possibilitando medir:
-
-* ⏱️ Tempo de inserção;
-* 🔎 Tempo de busca;
-* 🗑️ Tempo de remoção;
-* 🌳 Altura da árvore;
-* 🔢 Número de comparações;
-* 🔄 Número de rotações, quando aplicável.
-
-Dessa forma, o dataset permite comparar o comportamento das estruturas de árvore escolhidas pelo grupo em diferentes condições, incluindo **dados aleatórios, ordenados, duplicados e operações de inserção, busca e remoção**.
+O dataset foi escolhido por seu alto volume e variedade de atributos, permitindo avaliar as estruturas com entradas de diferentes tamanhos e tipos de várias maneiras. A chave composta (scientificName, year, gbifID) também permite implementar e testar um comparador personalizado, exigindo comparação de texto e de valores numéricos. Os testes considerarão tanto entradas aleatórias e ordenadas, chaves repetidas artificialmente e todos os tipos de operações como inserção, busca e remoção. Serão observados o tempo de execução, a altura da árvore, o número de comparações e, na AVL, o número de rotações.
 
 ---
 
@@ -124,14 +110,13 @@ Além disso, a comparação entre BST e AVL possibilita relacionar os resultados
 
 As operações previstas para a implementação são:
 
-* [ ] Inserção
-* [ ] Remoção
-* [ ] Busca
-* [ ] Percurso em pré-ordem
-* [ ] Percurso em ordem
-* [ ] Percurso em pós-ordem
-* [ ] Balanceamento, se aplicável
-* [ ] Outra: a definir
+* [ ] Inserção de registro usando chave composta;
+* [ ] Remoção de registros usando chave composta;
+* [ ] Busca de registro usando a chave composta;
+* [ ] Percurso em pré-ordem, em ordem e em pós-ordem;
+* [ ] Cálculo da altura e contagem de comparações;
+* [ ] Na AVL, contagem de rotações e verificação do balanceamento;
+* [ ] Outra: a definir;
 
 > **Observação:** operações referentes à **Entrega 2** serão preenchidas conforme a implementação do projeto.
 
@@ -172,23 +157,21 @@ O(n)	Cresce proporcionalmente aos dados <br>
 
 ## 3.1 Objetivo dos Testes
 
-Os testes terão como objetivo verificar a corretude das estruturas de árvore e analisar seu comportamento diante de diferentes formas de entrada.
+Os testes terão como objetivo verificar a corretude da BST e da AVL e comparar seu comportamento sob as mesmas entradas e operações. Para cada conjunto de dados, as duas árvores receberão os mesmos registros e serão submetidas à mesma sequência de operações.
 
 Serão considerados os seguintes objetivos:
 
-- Verificar se os registros são inseridos corretamente;
+- Verificar se cada chave inserida pode ser encontrada;
 - Verificar se registros podem ser localizados pela chave gbifID;
-- Verificar o comportamento das operações de remoção;
+- Verificar se a remoção de uma chave existente é estável e se essa remoção mantém a estrutura consistente;
 - Avaliar o comportamento das árvores com diferentes distribuições de dados;
-- Verificar o comportamento com dados em ordem crescente e decrescente;
+- Comparar os resultados da BST e da AVL após inserções, buscas e remoções;
+- Comparar o tempo de execução e, na AVL, rotações;
 - Verificar o tratamento de registros duplicados;
 - Avaliar casos extremos, como árvores vazias e árvores contendo apenas um elemento;
 - Observar a altura das estruturas;
-- Contabilizar o número de comparações realizadas;
-- Verificar, na AVL, o comportamento relacionado ao balanceamento e às rotações.
 
-Os testes também permitirão posteriormente relacionar o comportamento observado nas execuções com as complexidades assintóticas teóricas das estruturas BST e AVL.
-
+As medições serão feitas no mesmo computador, em múltiplos cenários. Cada medição será repetida cinco vezes; a primeira execução será apresentada a mediana das quatro execuções restantes. A mesma regra será aplicada à BST e à AVL.
 
 ---
 
