@@ -37,7 +37,7 @@ Inicialmente, será utilizado um conjunto de aproximadamente **500.000 registros
 O dataset será obtido por meio do **GBIF (Global Biodiversity Information Facility)**, utilizando registros de ocorrência classificados no grupo taxonômico **Fungi**.
 
 🔗 **Fonte:**
-https://www.gbif.org/occurrence/search?taxonKey=5
+https://www.gbif.org/pt/occurrence/search?kingdom=Fungi&utmSource=chatgpt.com&taxonKey=F
 
 ---
 
@@ -302,7 +302,7 @@ Fungos-das--rvores-C/
 * **GBIF — Global Biodiversity Information Facility**
   Registros de ocorrência de organismos do grupo taxonômico Fungi.
 
-  https://www.gbif.org/occurrence/search?taxonKey=5
+  https://www.gbif.org/pt/occurrence/search?kingdom=Fungi&utmSource=chatgpt.com&taxonKey=F
 
 * **Materiais fornecidos pelo professor Cid Rodrigues de Andrade**
   Disciplina de Estruturas de Dados II — UNICID.
