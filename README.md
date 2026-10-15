@@ -9,12 +9,12 @@
 
 ## 👥 Integrantes do Grupo
 
-| Nome completo                   |         RA |
-| ------------------------------- | ---------: |
-| **Guilherme Coelho**            |   42966515 |
-| **Maria Luisa Assunção Novaes** |   42802881 |
-| **Miguel Targino**              |   43079067 |
-| **Thiago Salles**               |   43461905 |
+| Nome completo                      |         RA |
+| ---------------------------------- | ---------: |
+| **Guilherme Coelho Silva**         |   42966515 |
+| **Maria Luisa Assunção Novaes**    |   42802881 |
+| **Miguel Targino Felix **          |   43079067 |
+| **Thiago Salles de Almeida Silva** |   43461905 |
 
 ---
 
