@@ -61,9 +61,11 @@ Serão utilizados os principais atributos disponíveis nos registros para repres
 | `longitude`      | Float   | Longitude da ocorrência                       |
 | `year`           | Inteiro | Ano do registro                               |
 
-Para atender ao requisito de chave composta, as operações de inserção, busca e remoção utilizarão uma chave formada pela combinação dos campos (scientificName, year, gbifID). O comparador examinará os campos na seguinte ordem: primeiro scientificName, lexicográfica, year (em ordem numérica) e gbifID. O resultado do comparador será negativo quando a primeira chave vier antes da segunda, zero quando todos os componentes forem iguais e positivo quando vier depois.
+Para atender ao requisito de chave composta, as operações de inserção, busca e remoção utilizarão uma chave formada pela combinação dos campos (scientificName, year, gbifID). O comparador examinará os campos nesta ordem: primeiro scientificName (em ordem lexicográfica), depois year (em ordem numérica) e, por fim, gbifID (em ordem numérica). O resultado do comparador será negativo quando a primeira chave vier antes da segunda, zero quando todos os componentes forem iguais e positivo quando vier depois.
 
-A mesma função de comparação será utilizada pela BST e pela AVL, garantindo que as duas estruturas apliquem exatamente a mesma regra. Uma chave será considerada repetida somente quando os três componentes forem iguais. O gbifID isolado poderá continuar armazenado como atributo do registro, mas não será usado sozinho como chave de comparação do projeto. Nos testes de duplicidade, serão criadas cópias artificiais de registros para forçar a repetição da mesma chave composta. A regra adotada será rejeitar a inserção quando a chave já existir, sem criar um segundo nó. Registros com scientificName ou year iguais, mas com outro gbifID, serão considerados chaves diferentes.
+Registros sem scientificName ou sem year serão descartados na carga dos dados, pois ambos fazem parte da chave.
+
+A mesma função de comparação será utilizada pela BST e pela AVL, garantindo que as duas estruturas apliquem exatamente a mesma regra. Uma chave será considerada repetida somente quando os três componentes forem iguais. O gbifID isolado poderá continuar armazenado como atributo do registro, mas não será usado sozinho como chave de comparação do projeto. Nos testes de duplicidade, serão criadas cópias artificiais de registros para forçar a repetição da mesma chave composta. A regra adotada será rejeitar a inserção quando a chave já existir, sem criar um segundo nó. Registros com mesmo scientificName e mesmo year, mas com outro gbifID, serão considerados chaves diferentes.
 
 
 ---
@@ -114,6 +116,7 @@ As operações previstas para a implementação são:
 * [ ] Cálculo da altura e contagem de comparações;
 * [ ] Na AVL, contagem de rotações e verificação do balanceamento;
 * [ ] Outra: a definir;
+* [ ] Verificação de consistência: propriedade de busca (percurso em ordem) nas duas árvores e fator de balanceamento na AVL;
 
 > **Observação:** operações referentes à **Entrega 2** serão preenchidas conforme a implementação do projeto.
 
@@ -196,7 +199,7 @@ Serão considerados os seguintes casos extremos:
 - 🔁 Dados duplicados: verificar a rejeição de registros com a mesma chave composta (scientificName, year, gbifID);
 - 🔀 Chaves que diferem em um único componente: registros com mesmo scientificName e year e gbifID diferente, ou mesmo scientificName e gbifID e year diferente, devem ser aceitos como chaves distintas;
 - ⬆️ Dados em ordem crescente: inserir registros previamente ordenados pela chave composta, pois a ordem do gbifID sozinha não produz uma sequência ordenada para o comparador, que começa por scientificName;
-- ⬇️ Dados em ordem decrescente: inserir os registros na ordem inversa da chave composta, para observar a degeneração da BST e as rotações da AVL;
+- ⬇️ Dados em ordem decrescente: inserir os registros na ordem inversa da chave composta, para observar a degeneração da BST (limitada aos mesmos tamanhos do cenário 2) e as rotações da AVL;
 - 📦 Grande volume de dados: utilizar o maior conjunto previsto (1 milhão de registros) em ordem aleatória, para verificar o comportamento das estruturas em grande escala;
 - 🔎 Busca de elemento existente e inexistente: verificar se um registro presente é encontrado e se a ausência de um registro é identificada corretamente;
 - 🗑️ Remoção de elemento existente e inexistente: verificar a remoção de registros presentes (folha, nó com um filho e nó com dois filhos) e se a árvore permanece consistente ao tentar remover uma chave inexistente.
@@ -218,6 +221,7 @@ Os testes de desempenho serão realizados utilizando diferentes tamanhos de entr
 * **1.000.000 de registros**
 
 Serão avaliados fatores como tempo de execução, número de comparações, altura da árvore e, quando aplicável, número de rotações.
+Observação: os tamanhos acima valem para os cenários 1, 3 e 4 nas duas árvores e para o cenário 2 na AVL. No cenário 2 (e no caso extremo de ordem decrescente), a BST será testada apenas com 10.000, 20.000 e 50.000 registros, conforme a seção 3.2.
 
 ---
 
@@ -274,7 +278,7 @@ Os comandos específicos de compilação e execução serão adicionados posteri
 A estrutura prevista para o projeto é:
 
 ```text
-Fungos-das-Arvores-C/
+Fungos-das--rvores-C/
 │
 ├── src/
 │   └── código-fonte
