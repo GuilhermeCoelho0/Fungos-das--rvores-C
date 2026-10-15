@@ -90,19 +90,16 @@ Serão utilizadas duas estruturas de árvore para organização dos registros do
 
 A escolha da BST e da AVL nos permite analisar o comportamento das árvores em diferentes condições de entrada.
 
-A BST possui uma estrutura relativamente simples e organiza os registros de acordo com a chave gbifID. Quando a árvore apresenta uma distribuição equilibrada, as operações de busca, inserção e remoção podem apresentar complexidade média de O(log n). Entretanto, uma BST não balanceada pode atingir uma altura próxima de n, fazendo com que essas operações apresentem complexidade de O(n) no pior caso.
+A BST possui uma estrutura relativamente simples e organiza os registros pela chave composta (scientificName, year, gbifID), comparada pela função descrita na seção 1.3. Quando os registros chegam em uma ordem que mantém a árvore aproximadamente equilibrada (por exemplo, ordem aleatória), as operações de busca, inserção e remoção apresentam complexidade média de O(log n). Entretanto, uma BST sem balanceamento, ao receber registros já ordenados pela chave composta, pode atingir altura próxima de n, fazendo com que essas operações apresentem complexidade O(n) no pior caso.
 
-A AVL, por outro lado, mantém a árvore balanceada por meio de rotações após determinadas operações. Seu objetivo é manter a altura da árvore em ordem logarítmica em relação ao número de elementos, evitando que a estrutura se transforme em uma árvore linear.
+A AVL, por outro lado, mantém a árvore balanceada por meio de rotações após inserções e remoções. Seu objetivo é manter a altura em ordem logarítmica em relação ao número de elementos, evitando que a estrutura se transforme em uma lista encadeada.
 
 A escolha conjunta das duas estruturas permite analisar a diferença entre:
 
-uma árvore de busca que não possui balanceamento automático, representada pela BST;
-uma árvore de busca auto-balanceada, representada pela AVL.
+- uma árvore de busca sem balanceamento automático, representada pela BST;
+- uma árvore de busca auto-balanceada, representada pela AVL.
 
-Essa comparação é adequada ao dataset porque o conjunto possui potencial para conter centenas de milhares de registros. Dessa forma, alterações na altura da árvore podem ter impacto significativo no número de comparações necessárias para localizar ou modificar um registro.
-
-Além disso, a comparação entre BST e AVL possibilita relacionar os resultados dos testes práticos com suas respectivas complexidades assintóticas e observar como o balanceamento influencia o comportamento das operações.
-
+Essa comparação é adequada ao dataset porque o conjunto possui centenas de milhares de registros e a chave começa por um texto (scientificName). Como cada comparação de chaves envolve comparação de strings, a altura da árvore tem impacto direto no custo de localizar ou modificar um registro. Além disso, o GBIF possui muitas ocorrências para o mesmo scientificName, de modo que as comparações frequentemente avançam até year e gbifID, exercitando o comparador completo.
 
 ---
 
@@ -157,35 +154,35 @@ O(n)	Cresce proporcionalmente aos dados <br>
 
 ## 3.1 Objetivo dos Testes
 
-Os testes terão como objetivo verificar a corretude da BST e da AVL e comparar seu comportamento sob as mesmas entradas e operações. Para cada conjunto de dados, as duas árvores receberão os mesmos registros e serão submetidas à mesma sequência de operações.
+Os testes terão como objetivo verificar a corretude da BST e da AVL e comparar seu comportamento sob as mesmas entradas e operações. Para cada conjunto de dados, as duas árvores receberão os mesmos registros e serão submetidas à mesma sequência de operações. Todas as operações usam a chave composta (scientificName, year, gbifID).
 
 Serão considerados os seguintes objetivos:
 
-- Verificar se cada chave inserida pode ser encontrada;
-- Verificar se registros podem ser localizados pela chave gbifID;
-- Verificar se a remoção de uma chave existente é estável e se essa remoção mantém a estrutura consistente;
-- Avaliar o comportamento das árvores com diferentes distribuições de dados;
-- Comparar os resultados da BST e da AVL após inserções, buscas e remoções;
-- Comparar o tempo de execução e, na AVL, rotações;
-- Verificar o tratamento de registros duplicados;
-- Avaliar casos extremos, como árvores vazias e árvores contendo apenas um elemento;
-- Observar a altura das estruturas;
+- Verificar se cada chave composta inserida é encontrada pela busca;
+- Verificar a regra de duplicidade: uma chave repetida (os três componentes iguais) é rejeitada sem criar novo nó, e chaves que diferem em apenas um componente são aceitas;
+- Verificar se a remoção de uma chave existente mantém a árvore consistente e se a remoção de uma chave inexistente não altera a árvore;
+- Verificar automaticamente, após inserções e remoções, a propriedade de busca nas duas árvores (o percurso em ordem deve produzir as chaves em ordem estritamente crescente segundo o comparador) e, na AVL, o fator de balanceamento entre -1 e 1 em todos os nós;
+- Comparar a BST e a AVL sob as mesmas entradas e operações, com diferentes distribuições de dados;
+- Observar a altura das estruturas, o número de comparações, o tempo de execução e, na AVL, o número de rotações;
+- Avaliar casos extremos, como árvore vazia e árvore com um único elemento.
 
-As medições serão feitas no mesmo computador, em múltiplos cenários. Cada medição será repetida cinco vezes; a primeira execução será apresentada a mediana das quatro execuções restantes. A mesma regra será aplicada à BST e à AVL.
+Todas as medições serão feitas no mesmo computador, recém-ligado e sem outros programas em execução, para que o tempo medido reflita o comportamento das árvores e não o ruído da máquina. Cada medição será repetida cinco vezes; a primeira execução (aquecimento) será descartada e será reportada a mediana das quatro restantes. A mesma regra vale para a BST e para a AVL.
+
 
 ---
 
 ## 3.2 Cenários de Teste
 
-Além dos diferentes tipos e volumes de dados, serão considerados três cenários relacionados às condições de utilização do computador durante a execução dos testes. O objetivo é observar se a carga de trabalho do sistema influencia o tempo de execução das operações realizadas pelas estruturas de árvore.
+Em todos os cenários, os mesmos registros e a mesma sequência de operações são aplicados à BST e à AVL.
 
-|  #  | Cenário                            | Entrada / Condição do sistema                                                                                                                                                                                                 | Resultado esperado                                                                                                      | Status |
-| :-: | :--------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------- | :----: |
-|  1  | **Baixa utilização do sistema**    | Execução do teste logo após a inicialização do computador, com o mínimo possível de programas e processos adicionais em execução.                                                                                             | Obter uma referência de desempenho com baixa utilização dos recursos do computador.                                     |    ☐   |
-|  2  | **Utilização moderada do sistema** | Execução do teste após o computador ter sido utilizado normalmente por algum período, com programas e processos comuns em execução.                                                                                           | Verificar a variação do desempenho das operações em uma condição de utilização moderada dos recursos.                   |    ☐   |
-|  3  | **Alta utilização do sistema**     | Execução do teste enquanto o computador estiver executando diversas tarefas simultaneamente, como várias abas do navegador, programas em segundo plano ou processos de maior consumo de recursos, como renderização de vídeo. | Verificar o comportamento e a variação do tempo de execução das operações sob maior utilização dos recursos do sistema. |    ☐   |
+| # | Cenário | Entrada | Operações | Resultado esperado | Status |
+|---|---------|---------|-----------|--------------------|--------|
+| 1 | Inserção em ordem aleatória | Registros embaralhados; 50 mil, 100 mil, 250 mil, 500 mil e 1 milhão | Inserção de todos os registros; busca de todas as chaves inseridas | BST com altura da ordem de 2 a 3 vezes log2(n); AVL com altura entre log2(n) e 1,44·log2(n); todas as buscas encontram a chave | ☐ |
+| 2 | Inserção em ordem crescente | Registros ordenados pela chave composta (scientificName, year, gbifID) antes da inserção; AVL com todos os tamanhos e BST com 10 mil, 20 mil e 50 mil | Inserção de todos os registros; busca da primeira e da última chave | BST degenera em lista (altura igual a n, busca O(n)); AVL mantém altura logarítmica com número de rotações da ordem de n | ☐ |
+| 3 | Buscas e remoções intercaladas | Árvore montada com inserção aleatória (cenário 1) em 100 mil e 500 mil registros | Buscas de 10% de chaves existentes e 10% de inexistentes, intercaladas com a remoção de 10% das chaves | Buscas de chaves existentes encontram o registro e as de inexistentes não; árvores consistentes após as remoções; AVL com menos comparações por operação que a BST e com fator de balanceamento entre -1 e 1 | ☐ |
+| 4 | Duplicatas forçadas | Dataset do cenário 1 (100 mil registros) mais cópias artificiais de 1% dos registros, com a mesma chave composta | Tentativa de inserir as cópias; inserção de registros com mesmo scientificName e year, mas gbifID diferente | Cópias rejeitadas, sem criar nó e sem alterar o número de elementos; registros que diferem em um componente da chave aceitos | ☐ |
 
-
+Observação: a inserção da BST será implementada de forma iterativa, e o cenário 2 limita a BST a tamanhos menores, pois a inserção de n chaves ordenadas custa O(n²) comparações e a recursão em uma árvore degenerada pode estourar a pilha.
 
 
 ---
@@ -194,21 +191,17 @@ Além dos diferentes tipos e volumes de dados, serão considerados três cenári
 
 Serão considerados os seguintes casos extremos:
 
-- 🌱 Árvore vazia: verificar o comportamento das operações quando nenhum registro foi inserido;  
-- 1️⃣ Árvore com um único elemento: verificar inserção, busca e remoção de um único registro;  
-- 1️⃣ Árvore com um único elemento: verificar inserção, busca e remoção de um único registro;  
-- 🔁 Dados duplicados: verificar o comportamento quando existem registros com a mesma chave gbifID;  
-- ⬆️ Dados em ordem crescente: inserir registros com gbifID em ordem crescente para observar o comportamento da BST e o balanceamento da AVL;  
-- ⬇️ Dados em ordem decrescente: inserir registros com gbifID em ordem decrescente para observar o comportamento da BST e o balanceamento da AVL;  
-- 📦 Grande volume de dados: utilizar o maior conjunto de registros previsto para verificar o comportamento das estruturas em grande escala;  
-- 🔎 Busca de elemento existente: verificar se um registro presente é encontrado corretamente;  
-- ❌ Busca de elemento inexistente: verificar se a estrutura identifica corretamente a ausência do registro;  
-- 🗑️ Remoção de elemento existente: verificar a remoção de registros presentes na árvore;  
-- ❌ Remoção de elemento inexistente: verificar se a estrutura permanece consistente quando se tenta remover uma chave inexistente.  
+- 🌱 Árvore vazia: verificar o comportamento de busca, remoção e percursos quando nenhum registro foi inserido;
+- 1️⃣ Árvore com um único elemento: verificar inserção, busca e remoção de um único registro;
+- 🔁 Dados duplicados: verificar a rejeição de registros com a mesma chave composta (scientificName, year, gbifID);
+- 🔀 Chaves que diferem em um único componente: registros com mesmo scientificName e year e gbifID diferente, ou mesmo scientificName e gbifID e year diferente, devem ser aceitos como chaves distintas;
+- ⬆️ Dados em ordem crescente: inserir registros previamente ordenados pela chave composta, pois a ordem do gbifID sozinha não produz uma sequência ordenada para o comparador, que começa por scientificName;
+- ⬇️ Dados em ordem decrescente: inserir os registros na ordem inversa da chave composta, para observar a degeneração da BST e as rotações da AVL;
+- 📦 Grande volume de dados: utilizar o maior conjunto previsto (1 milhão de registros) em ordem aleatória, para verificar o comportamento das estruturas em grande escala;
+- 🔎 Busca de elemento existente e inexistente: verificar se um registro presente é encontrado e se a ausência de um registro é identificada corretamente;
+- 🗑️ Remoção de elemento existente e inexistente: verificar a remoção de registros presentes (folha, nó com um filho e nó com dois filhos) e se a árvore permanece consistente ao tentar remover uma chave inexistente.
 
-Os dados em ordem crescente e decrescente são especialmente relevantes para a BST, pois podem produzir uma árvore altamente desbalanceada e aproximar seu comportamento do pior caso O(n).
-
-Na AVL, esses mesmos cenários permitem verificar a capacidade de manutenção do balanceamento por meio das rotações.
+Os dados em ordem crescente e decrescente são especialmente relevantes para a BST, pois produzem uma árvore altamente desbalanceada e aproximam seu comportamento do pior caso O(n). Na AVL, esses mesmos cenários permitem verificar a manutenção do balanceamento por meio das rotações.
 
 ---
 
