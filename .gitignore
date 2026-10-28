@@ -1,0 +1,9 @@
+*.exe
+*.o
+*.out
+bin/
+obj/
+*.cbp
+*.layout
+*.depend
+dataset/*.csv
