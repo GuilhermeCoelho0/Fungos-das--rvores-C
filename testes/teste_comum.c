@@ -23,9 +23,7 @@ static int g_falhas = 0, g_checks = 0;
         }                                                                    \
     } while (0)
 
-/* ------------------------------------------------------------------ */
-/* Utilitarios                                                         */
-/* ------------------------------------------------------------------ */
+/* Utilitarios*/
 static unsigned long long splitmix(unsigned long long *s)
 {
     unsigned long long z = (*s += 0x9E3779B97F4A7C15ULL);
@@ -45,7 +43,7 @@ static int cmp_double(const void *a, const void *b)
     return (x > y) - (x < y);
 }
 
-/* Mediana (media dos dois centrais se n for par). */
+/* Mediana */
 static double mediana(const double *v, int n)
 {
     double tmp[MAX_REPS];
@@ -57,7 +55,7 @@ static double mediana(const double *v, int n)
 
 static double segundos(clock_t ini) { return (double)(clock() - ini) / (double)CLOCKS_PER_SEC; }
 
-/* Limite superior folgado da altura AVL: 1,45 * (floor(log2(n+2)) + 1). */
+/* Calcula o limite de altura da AVL com uma folga. */
 static int limite_altura_avl(size_t n)
 {
     int bits = 0;
@@ -99,9 +97,7 @@ static void estado(const OpsArvore *o, void *t, size_t esperado, const char *rot
     CHECK(o->validar(t), "%s: validacao estrutural falhou", rot);
 }
 
-/* ------------------------------------------------------------------ */
-/* Casos extremos e testes de corretude com dados artificiais          */
-/* ------------------------------------------------------------------ */
+/* Casos extremos e testes de corretude com dados artificiais */
 static void teste_comparador(void)
 {
     Registro a = mk("Amanita", 2020, 5), b = mk("Amanita", 2020, 6), c = mk("Amanita", 2021, 1);
@@ -161,7 +157,7 @@ static void teste_chaves_distintas(const OpsArvore *o)
 
 static void teste_remocao_formas(const OpsArvore *o)
 {
-    /* chaves 50,30,70,20,40,60,80 (mesmo nome e id; muda so o year) */
+    /* Insere chaves para testar diferentes tipos de remocao. */
     int anos[7] = {50, 30, 70, 20, 40, 60, 80};
     Registro r[7];
     for (int i = 0; i < 7; i++) r[i] = mk("N", anos[i], 1);
@@ -227,7 +223,7 @@ static void teste_rotacoes(const OpsArvore *o)
     }
 }
 
-/* Comparacao com um modelo simples: presenca[ano] (chave = ("F", ano, 1)). */
+/* Comparacao com um modelo simples*/
 static void teste_modelo_aleatorio(const OpsArvore *o)
 {
     enum { K = 1000, OPS = 20000 };
@@ -276,9 +272,7 @@ static void casos_extremos(const OpsArvore *o)
     printf("   %d verificacoes, %d falha(s)\n\n", g_checks - c0, g_falhas - f0);
 }
 
-/* ------------------------------------------------------------------ */
-/* Contexto, fases e saida                                             */
-/* ------------------------------------------------------------------ */
+/* Contexto, fases e saida*/
 typedef struct {
     const OpsArvore *ops;
     Registro *vet;
@@ -292,6 +286,9 @@ typedef struct {
     size_t sizes[MAX_TAM];
     int nsizes;
     int tamanhos_usuario;
+    char data_execucao[11];
+    char hora_execucao[9];
+    FILE *historico;
 } Ctx;
 
 typedef struct {
@@ -491,7 +488,7 @@ static int cen_d(Ctx *c, size_t k, int rep, Fase *f)
     }
     size_t antes = o->tamanho(t);
 
-    /* Fase 1: copias exatas (devem ser todas rejeitadas). */
+    /* Fase 1: copias exatas */
     o->zerar_comparacoes(t);
     clock_t ini = clock();
     size_t rej = 0, acei = 0;
@@ -506,7 +503,7 @@ static int cen_d(Ctx *c, size_t k, int rep, Fase *f)
     CHECK(o->tamanho(t) == antes, "D (n=%lu): duplicatas aumentaram o numero de nos", UL(k));
     CHECK(f[0].valid, "D (n=%lu): estrutura invalida apos duplicatas", UL(k));
 
-    /* Fase 2: chaves que diferem em um unico componente (todas devem ser aceitas). */
+    /* Fase 2: chaves que diferem em um unico componente */
     o->zerar_comparacoes(t);
     ini = clock();
     size_t ok2 = 0, rej2 = 0;
@@ -526,20 +523,56 @@ static int cen_d(Ctx *c, size_t k, int rep, Fase *f)
     return 0;
 }
 
-/* ------------------------------------------------------------------ */
-/* Execucao de um cenario e relatorio                                  */
-/* ------------------------------------------------------------------ */
+static void iniciar_historico(Ctx *c, const char *csv, const char *dataset)
+{
+    c->historico = fopen("resultados/README.md", "a");
+
+    if (!c->historico) {
+        fprintf(stderr, "AVISO: nao foi possivel atualizar o README.md.\n");
+        return;
+    }
+
+    fprintf(c->historico, "\n---\n\n");
+    fprintf(c->historico, "## Execucao - %s\n\n", c->ops->nome);
+    fprintf(c->historico, "- **Data:** %s\n", c->data_execucao);
+    fprintf(c->historico, "- **Horario:** %s\n", c->hora_execucao);
+    fprintf(c->historico, "- **Dataset:** `%s`\n", dataset);
+    fprintf(c->historico, "- **Registros carregados:** %lu\n", UL(c->n));
+    fprintf(c->historico, "- **Cenarios:** %s\n", c->cenarios);
+    fprintf(c->historico, "- **Repeticoes:** %d\n", c->reps);
+    fprintf(c->historico, "- **Semente:** %llu\n", c->seed);
+    fprintf(c->historico, "- **CSV gerado:** `%s`\n\n", csv);
+
+    fprintf(c->historico,
+            "| Cenario | Fase | N | Tempo mediano (s) | Comparacoes | Altura | Rotacoes | Validacao |\n");
+    fprintf(c->historico,
+            "|---|---|---:|---:|---:|---:|---:|---|\n");
+
+    fflush(c->historico);
+}
+
+/* Execucao de um cenario e relatorio */
 static void emitir(Ctx *c, char id, const Fase *f, size_t k, double med, int usadas)
 {
     printf("  [%c] n=%-8lu %-22s tempo(mediana)=%9.4f s  comp=%-14llu altura=%-8d rot=%-10llu val=%s\n",
            id, UL(k), f->nome, med, f->comp, f->altura, f->rot,
            f->valid < 0 ? "-" : (f->valid ? "OK" : "FALHOU"));
+
     if (c->saida) {
-        fprintf(c->saida, "%s,%c,%s,%lu,%d,%.6f,%llu,%d,%llu,%lu,%lu,%lu,%lu,%lu,%lu,%lu,%s\n",
+        fprintf(c->saida, "%s,%c,%s,%lu,%d,%.6f,%llu,%d,%llu,%lu,%lu,%lu,%lu,%lu,%lu,%lu,%s,%s,%s\n",
                 c->ops->nome, id, f->nome, UL(k), usadas, med, f->comp, f->altura, f->rot, UL(f->tam),
                 UL(f->ia), UL(f->ir), UL(f->bo), UL(f->bi), UL(f->ro), UL(f->ri),
-                f->valid < 0 ? "NA" : (f->valid ? "OK" : "FALHOU"));
+                f->valid < 0 ? "NA" : (f->valid ? "OK" : "FALHOU"),
+                c->data_execucao, c->hora_execucao);
         fflush(c->saida);
+    }
+    if (c->historico) {
+        fprintf(c->historico,
+                "| %c | %s | %lu | %.6f | %llu | %d | %llu | %s |\n",
+                id, f->nome, UL(k), med, f->comp, f->altura, f->rot,
+                f->valid < 0 ? "NA" : (f->valid ? "OK" : "FALHOU"));
+
+        fflush(c->historico);
     }
 }
 
@@ -612,9 +645,7 @@ static void executar_cenarios(Ctx *c)
     }
 }
 
-/* ------------------------------------------------------------------ */
-/* Argumentos                                                          */
-/* ------------------------------------------------------------------ */
+/* Argumentos*/
 static void uso(const char *prog)
 {
     fprintf(stderr,
@@ -731,6 +762,18 @@ int teste_principal(const OpsArvore *ops, int argc, char **argv)
         printf("Resultado: %d verificacoes, %d falha(s)\n", g_checks, g_falhas);
         return g_falhas ? 1 : 0;
     }
+        /* Registra a data e o horario de inicio da execucao. */
+    time_t agora = time(NULL);
+    struct tm *info = localtime(&agora);
+
+    if (info == NULL) {
+        fprintf(stderr, "Erro ao obter data e horario.\n");
+        return 3;
+    }
+
+    strftime(c.data_execucao, sizeof c.data_execucao, "%d/%m/%Y", info);
+    strftime(c.hora_execucao, sizeof c.hora_execucao, "%H:%M:%S", info);
+
 
     /* Carga do dataset (fora de qualquer medicao de tempo das arvores). */
     char erro[256];
@@ -748,7 +791,7 @@ int teste_principal(const OpsArvore *ops, int argc, char **argv)
     printf("  tempo de leitura ............. %.3f s (nao entra nas medicoes das arvores)\n\n", segundos(ini));
     if (c.n == 0) { fprintf(stderr, "Erro: nenhum registro valido no CSV.\n"); free(c.vet); return 3; }
 
-    /* Ordem aleatoria reprodutivel (Fisher-Yates com PRNG proprio). */
+    /* Ordem aleatoria reprodutivel */
     c.perm = malloc(c.n * sizeof *c.perm);
     if (!c.perm) { fprintf(stderr, "Erro: sem memoria.\n"); free(c.vet); return 3; }
     for (size_t i = 0; i < c.n; i++) c.perm[i] = &c.vet[i];
@@ -757,7 +800,8 @@ int teste_principal(const OpsArvore *ops, int argc, char **argv)
         size_t j = (size_t)(splitmix(&sem) % (i + 1));
         const Registro *tmp = c.perm[i]; c.perm[i] = c.perm[j]; c.perm[j] = tmp;
     }
-    /* Chaves repetidas no arquivo? (gbifID e unico no GBIF; se houver, avisa) */
+
+    /* Verifica se existem chaves repetidas no arquivo. */
     {
         const Registro **cp = malloc(c.n * sizeof *cp);
         if (cp) {
@@ -777,20 +821,34 @@ int teste_principal(const OpsArvore *ops, int argc, char **argv)
         saida_caminho = saida_padrao;
     }
     c.saida = fopen(saida_caminho, "w");
+
     if (!c.saida) {
-        fprintf(stderr, "AVISO: nao foi possivel criar '%s' (%s); os resultados so aparecerao na tela.\n"
-                        "       Rode a partir da raiz do projeto e confirme que a pasta existe, ou use --saida.\n\n",
-                saida_caminho, strerror(errno));
+    fprintf(stderr, "AVISO: nao foi possivel criar '%s' (%s); os resultados so aparecerao na tela.\n"
+                    "       Rode a partir da raiz do projeto e confirme que a pasta existe, ou use --saida.\n\n",
+            saida_caminho, strerror(errno));
     } else {
-        fprintf(c.saida, "arvore,cenario,fase,n,execucoes_usadas,tempo_mediana_s,comparacoes,altura_final,rotacoes,"
-                         "tamanho_final,ins_aceitas,ins_rejeitadas,buscas_ok,buscas_inesperadas,rem_ok,rem_inesperadas,validacao\n");
+    fprintf(c.saida, "arvore,cenario,fase,n,execucoes_usadas,tempo_mediana_s,comparacoes,altura_final,rotacoes,"
+                     "tamanho_final,ins_aceitas,ins_rejeitadas,buscas_ok,buscas_inesperadas,rem_ok,rem_inesperadas,validacao,data_execucao,hora_execucao\n");
+
+    iniciar_historico(&c, saida_caminho, csv);
     }
     printf("Medicao: clock() (tempo de CPU) somente das operacoes na arvore; %d execucao(oes), 1a descartada, mediana das demais.\n"
            "Semente: %llu. Registros disponiveis: %lu.\n\n", c.reps, c.seed, UL(c.n));
 
     executar_cenarios(&c);
 
-    if (c.saida) { fclose(c.saida); printf("Resultados gravados em %s\n", saida_caminho); }
+    if (c.saida) {
+    fclose(c.saida);
+    printf("Resultados gravados em %s\n", saida_caminho);
+    }
+
+    if (c.historico) {
+    fprintf(c.historico, "\n**Verificacoes:** %d  \n", g_checks);
+    fprintf(c.historico, "**Falhas:** %d\n", g_falhas);
+    fprintf(c.historico, "\n");
+    fclose(c.historico);
+    }
+
     free(c.perm);
     free(c.vet);
     printf("Resultado final: %d verificacoes, %d falha(s)\n", g_checks, g_falhas);
