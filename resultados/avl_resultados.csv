@@ -1,0 +1,8 @@
+arvore,cenario,fase,n,execucoes_usadas,tempo_mediana_s,comparacoes,altura_final,rotacoes,tamanho_final,ins_aceitas,ins_rejeitadas,buscas_ok,buscas_inesperadas,rem_ok,rem_inesperadas,validacao,data_execucao,hora_execucao
+avl,A,insercao,384,4,0.000000,2806,9,232,384,384,0,0,0,0,0,OK,02/11/2026,15:19:11
+avl,A,busca_todas,384,4,0.000000,3000,9,0,384,0,0,384,0,0,0,NA,02/11/2026,15:19:11
+avl,B,insercao_ordenada,384,4,0.000000,2945,8,375,384,384,0,0,0,0,0,OK,02/11/2026,15:19:11
+avl,B,busca_primeira_ultima,384,4,0.000000,18,8,0,384,0,0,2,0,0,0,NA,02/11/2026,15:19:11
+avl,C,buscas_remocoes,384,4,0.000000,1299,9,254,345,384,0,78,0,39,0,OK,02/11/2026,15:19:11
+avl,D,copias_exatas,384,4,0.000000,21,9,232,384,0,4,0,0,0,0,OK,02/11/2026,15:19:11
+avl,D,chaves_distintas,384,4,0.000000,74,9,239,392,8,0,0,0,0,0,OK,02/11/2026,15:19:11
