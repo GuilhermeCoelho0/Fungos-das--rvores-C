@@ -28,7 +28,7 @@ O domínio do dataset é a **biodiversidade de espécies de fungos**. Cada regis
 
 Os dados foram obtidos em formato estruturado, como **CSV**, e será utilizado um subconjunto dos registros disponíveis para adequação aos requisitos do projeto.
 
-Inicialmente, será utilizado um conjunto de aproximadamente **500.000 registros**, podendo chegar a **879.726 registros** nos testes de maior escala.
+Inicialmente, será utilizado um conjunto de aproximadamente **500.000 registros**, podendo chegar a **879.726 registros** válidos e incluir os filtros de país e período.
 
 ---
 
@@ -72,7 +72,9 @@ A mesma função de comparação será utilizada pela BST e pela AVL, garantindo
 
 ## 1.4 Justificativa da Escolha
 
-O dataset foi escolhido por seu alto volume e variedade de atributos, permitindo avaliar as estruturas com entradas de diferentes tamanhos e tipos de várias maneiras. A chave composta (scientificName, year, gbifID) também permite implementar e testar um comparador personalizado, exigindo comparação de texto e de valores numéricos. Os testes considerarão tanto entradas aleatórias e ordenadas, chaves repetidas artificialmente e todos os tipos de operações como inserção, busca e remoção. Serão observados o tempo de execução, a altura da árvore, o número de comparações e, na AVL, o número de rotações.
+O dataset foi escolhido por seu alto volume de registros e pela variedade de atributos, permitindo avaliar o comportamento das estruturas com diferentes tamanhos e distribuições de entrada. A chave composta (`scientificName`, `year`, `gbifID`) possibilitou implementar e testar um comparador personalizado, que envolve comparações de texto e de valores numéricos.
+
+Nos testes realizados, foram utilizadas entradas em ordem aleatória e crescente, além de chaves repetidas artificialmente para verificar o tratamento de duplicidades. Também foram avaliadas as operações de inserção, busca e remoção. Para comparar o desempenho da BST e da AVL, foram observados o tempo de execução, a altura das árvores, o número de comparações e, no caso da AVL, o número de rotações.
 
 ---
 
@@ -80,11 +82,11 @@ O dataset foi escolhido por seu alto volume e variedade de atributos, permitindo
 
 ## 2.1 Estrutura(s)
 
-foram utilizadas duas estruturas de árvore para organização dos registros do dataset:
+Foram utilizadas duas estruturas de árvore para a organização dos registros do dataset:
 
-Árvore Binária de Busca (BST — Binary Search Tree);
-Árvore AVL (Adelson-Velsky e Landis).
+- **Árvore Binária de Busca (BST — Binary Search Tree):** estrutura em que cada nó possui, no máximo, dois filhos. Os valores menores que a chave do nó ficam na subárvore esquerda, enquanto os maiores ficam na subárvore direita. Essa organização permite realizar operações de busca, inserção e remoção, mas seu desempenho depende da distribuição e da ordem de inserção dos dados. Em casos desfavoráveis, a árvore pode ficar desbalanceada.
 
+- **Árvore AVL (Adelson-Velsky e Landis):** é uma árvore binária de busca autobalanceada. Para cada nó, o fator de balanceamento é calculado pela diferença entre as alturas das subárvores esquerda e direita. Esse fator deve permanecer entre -1 e 1. Quando uma inserção ou remoção provoca um desequilíbrio, a estrutura realiza rotações para recuperar o balanceamento. Existem quatro casos de rotação: **simples à esquerda, simples à direita, dupla esquerda-direita e dupla direita-esquerda**.
 
 ---
 
@@ -107,16 +109,15 @@ Essa comparação é adequada ao dataset porque o conjunto possui centenas de mi
 
 ## 2.3 Operações Implementadas
 
-As operações previstas para a implementação são:
+Foram implementadas as seguintes operações nas estruturas BST e AVL:
 
-* [x] Inserção de registro usando chave composta;
+* [x] Inserção de registros usando chave composta;
 * [x] Remoção de registros usando chave composta;
-* [x] Busca de registro usando a chave composta;
-* [x] Percurso em pré-ordem, em ordem e em pós-ordem;
+* [x] Busca de registros usando chave composta;
+* [x] Percursos em pré-ordem, em ordem e em pós-ordem;
 * [x] Cálculo da altura e contagem de comparações;
 * [x] Na AVL, contagem de rotações e verificação do balanceamento;
-* [x] Verificação de consistência: propriedade de busca (percurso em ordem) nas duas árvores e fator de balanceamento na AVL;
-
+* [x] Verificação de consistência: propriedade de busca (percurso em ordem) nas duas árvores e fator de balanceamento na AVL.
 
 ---
 
@@ -156,19 +157,19 @@ Na AVL, o balanceamento mantém a altura da árvore em ordem O(log n). Dessa for
 
 ## 3.1 Objetivo dos Testes
 
-Os testes terão como objetivo verificar a corretude da BST e da AVL e comparar seu comportamento sob as mesmas entradas e operações. Para cada conjunto de dados, as duas árvores receberão os mesmos registros e serão submetidas à mesma sequência de operações. Todas as operações usam a chave composta (scientificName, year, gbifID).
+Os testes tiveram como objetivo verificar a corretude da BST e da AVL e comparar seu comportamento sob as mesmas entradas e operações. Para cada conjunto de dados, as duas árvores receberam os mesmos registros e foram submetidas à mesma sequência de operações. Todas as operações utilizaram a chave composta (`scientificName`, `year`, `gbifID`).
 
-Serão considerados os seguintes objetivos:
+Foram considerados os seguintes objetivos:
 
-- Verificar se cada chave composta inserida é encontrada pela busca;
-- Verificar a regra de duplicidade: uma chave repetida (os três componentes iguais) é rejeitada sem criar novo nó, e chaves que diferem em apenas um componente são aceitas;
-- Verificar se a remoção de uma chave existente mantém a árvore consistente e se a remoção de uma chave inexistente não altera a árvore;
-- Verificar automaticamente, após inserções e remoções, a propriedade de busca nas duas árvores (o percurso em ordem deve produzir as chaves em ordem estritamente crescente segundo o comparador) e, na AVL, o fator de balanceamento entre -1 e 1 em todos os nós;
+- Verificar se cada chave composta inserida foi encontrada pela busca;
+- Verificar a regra de duplicidade: uma chave repetida (os três componentes iguais) foi rejeitada sem criar um novo nó, enquanto chaves que diferiam em apenas um componente foram aceitas;
+- Verificar se a remoção de uma chave existente manteve a árvore consistente e se a remoção de uma chave inexistente não alterou a árvore;
+- Verificar automaticamente, após inserções e remoções, a propriedade de busca nas duas árvores (o percurso em ordem deveria produzir as chaves em ordem estritamente crescente segundo o comparador) e, na AVL, o fator de balanceamento entre -1 e 1 em todos os nós;
 - Comparar a BST e a AVL sob as mesmas entradas e operações, com diferentes distribuições de dados;
 - Observar a altura das estruturas, o número de comparações, o tempo de execução e, na AVL, o número de rotações;
-- Avaliar casos extremos, como árvore com um único elemento.
+- Avaliar casos extremos, como uma árvore com um único elemento.
 
-Todas as medições serão feitas no mesmo computador, recém-ligado e sem outros programas em execução, para que o tempo medido reflita o comportamento das árvores e não o ruído da máquina. Cada medição será repetida cinco vezes; a primeira execução (aquecimento) será descartada e será reportada a mediana das quatro restantes. A mesma regra vale para a BST e para a AVL.
+Todas as medições foram realizadas no mesmo computador, recém-ligado e sem outros programas em execução, para reduzir a interferência de outros processos nos tempos registrados. Cada medição foi repetida cinco vezes. A primeira execução, considerada de aquecimento, foi descartada, e a mediana das quatro execuções restantes foi utilizada como resultado. A mesma regra foi aplicada à BST e à AVL.
 
 
 ---
@@ -191,17 +192,23 @@ Observação: a inserção da BST será implementada de forma iterativa, e o cen
 
 ## 3.3 Casos Extremos (Edge Cases)
 
-Serão considerados os seguintes casos extremos:
+Foram executados testes para verificar o comportamento da BST e da AVL em situações específicas, incluindo os seguintes casos extremos:
 
-- 1️⃣ Árvore com um único elemento: verificar inserção, busca e remoção de um único registro;
-- 🔁 Dados duplicados: verificar a rejeição de registros com a mesma chave composta (scientificName, year, gbifID);
-- 🔀 Chaves que diferem em um único componente: registros com mesmo scientificName e year, mas com gbifID diferente devem ser aceitos como chaves distintas;
-- ⬆️ Dados em ordem crescente: inserir registros previamente ordenados pela chave composta, pois a ordem do gbifID sozinha não produz uma sequência ordenada para o comparador, que começa por scientificName;
-- 📦 Grande volume de dados: utilizar o maior conjunto previsto (879.726 registros) em ordem aleatória, para verificar o comportamento das estruturas em grande escala;
-- 🔎 Busca de elemento existente e inexistente: verificar se um registro presente é encontrado e se a ausência de um registro é identificada corretamente;
-- 🗑️ Remoção de elemento existente e inexistente: verificar a remoção de registros presentes (folha, nó com um filho e nó com dois filhos) e se a árvore permanece consistente ao tentar remover uma chave inexistente.
+- 🌳 **Árvore com um único elemento:** foi inserido um único registro e, em seguida, realizadas operações de busca e remoção. Foi verificado se o registro era encontrado corretamente, se a remoção era concluída e se a árvore permanecia válida após ficar vazia.
 
-Os dados em ordem crescente são especialmente relevantes para a BST, pois produzem uma árvore altamente desbalanceada e aproximam seu comportamento do pior caso O(n). Na AVL, esse mesmo cenário permite verificar a manutenção do balanceamento por meio das rotações.
+- 🔁 **Dados duplicados:** foram inseridos registros com a mesma chave composta (`scientificName`, `year`, `gbifID`). Foi verificado se a estrutura rejeitava as duplicatas, sem criar novos nós ou alterar indevidamente a quantidade de registros.
+
+- 🔀 **Chaves que diferem em um único componente:** foram inseridos registros com o mesmo `scientificName` e `year`, mas com valores diferentes de `gbifID`. Foi verificado se eram aceitos como chaves distintas e encontrados individualmente pelas operações de busca.
+
+- ⬆️ **Dados em ordem crescente:** foram inseridos registros previamente ordenados pela chave composta. Na BST, esse cenário foi testado com 50 mil registros; na AVL, foi executado para os tamanhos de entrada previstos. Foram observadas a altura das árvores, a quantidade de comparações e, na AVL, as rotações realizadas para manter o balanceamento. A ordenação foi feita pela chave composta, pois ordenar apenas pelo `gbifID` não garante uma sequência crescente segundo o comparador, que começa por `scientificName`.
+
+- 📦 **Grande volume de dados:** foi utilizado o maior conjunto disponível, com 879.726 registros em ordem aleatória. Foram observados o tempo de execução, a altura das árvores e o número de comparações, permitindo avaliar o comportamento das estruturas com uma grande quantidade de registros.
+
+- 🔎 **Busca de elemento existente e inexistente:** foram realizadas buscas por chaves presentes e ausentes nas árvores. Foi verificado se os registros existentes eram encontrados e se as buscas por registros inexistentes retornavam corretamente a ausência do elemento.
+
+- 🗑️ **Remoção de elemento existente e inexistente:** foram testadas remoções de nós existentes em diferentes situações: folha, nó com um filho e nó com dois filhos. Também foram realizadas tentativas de remoção de chaves inexistentes. Após as operações, foi verificada a consistência das árvores, incluindo a propriedade de busca nas duas estruturas e o balanceamento da AVL.
+
+Os dados em ordem crescente foram especialmente relevantes para a BST, pois produziram uma árvore altamente desbalanceada, aproximando seu comportamento do pior caso, com complexidade O(n) para operações como busca, inserção e remoção. Na AVL, o mesmo cenário permitiu verificar a manutenção do balanceamento por meio das rotações.
 
 ---
 
@@ -222,19 +229,29 @@ Observação: os tamanhos acima valem para os cenários 1 e 3 nas duas árvores 
 
 ## 3.5 Resultados Obtidos
 
+Foram realizadas duas rodadas completas de testes, ambas em 03/11/2026, com o mesmo computador, o mesmo dataset e a mesma semente:
+
+- **Rodada 1 (oficial):** computador recém-ligado e sem outros programas em execução, conforme a condição definida na seção 3.1.
+- **Rodada 2 (experimento complementar):** computador ligado havia algum tempo e com o DaVinci Resolve renderizando um vídeo. Ela mede a sensibilidade das medições ao ambiente e **não substitui** os resultados oficiais.
+
+Todas as tabelas de "Resultados oficiais" vêm da rodada 1. Os tempos da rodada 2 aparecem somente na seção "Experimento complementar", sempre identificados.
+
 ### Ambiente das medições
 
 - **Computador:** Intel Core i7-13650HX, 16 GB DDR5, NVIDIA GeForce RTX 3050 6GB Laptop GPU (a GPU não é usada).
 - **Sistema operacional:** Windows 11.
 - **Compilador:** GCC 14.2.0, com `-std=c11 -Wall -Wextra -O2`.
-- **Dataset:** `dataset/ocorrencias.csv`, 879.726 registros válidos.
+- **Dataset:** dataset completo `dataset/ocorrencias.csv`, com 879.726 registros válidos (GBIF, grupo Fungi; Finlândia, Noruega e Dinamarca; 2020 a 2022). Esse arquivo foi usado apenas localmente e **não está no repositório**, que contém somente a amostra de demonstração descrita na seção 4.1.
 - **Semente:** 42. **Repetições:** 5 (a primeira é descartada como aquecimento; reporta-se a mediana das 4 restantes).
 - **Comando:** `.\teste_bst.exe dataset/ocorrencias.csv --tamanhos 50000,100000,250000,500000,879726` (idem para `teste_avl.exe`).
-- **Condição:** computador recém-ligado e sem outros programas em execução (rodada oficial, 03/11/2026).
-- **Convenções:** o tempo é o tempo decorrido medido com `clock()`, com resolução de cerca de 1 ms; por isso valores abaixo de 1 ms são reportados como "<1 ms". A altura é medida em arestas (árvore com um único nó tem altura 0). Nos CSVs, os cenários 1 a 4 aparecem como A a D.
-- **Arquivos:** `resultados/bst_resultados.csv`, `resultados/avl_resultados.csv` e o registro bruto em `resultados/README.md`.
+- **Rodada 1 (oficial):** 03/11/2026, BST às 11:12 e AVL às 11:17, com o computador recém-ligado e sem outros programas em execução.
+- **Rodada 2 (complementar):** 03/11/2026, BST às 15:15 e AVL às 15:31, com o computador ligado havia algum tempo e o DaVinci Resolve renderizando um vídeo.
+- **Convenções:** o tempo é o tempo decorrido medido com `clock()`, com resolução de cerca de 1 ms; tempos abaixo disso aparecem como 0,000 s. A altura é medida em arestas (árvore com um único nó tem altura 0). Nos CSVs, os cenários 1 a 4 aparecem como A a D.
+- **Arquivos:**
+  - `resultados/README.md`: registro bruto das duas rodadas, com todas as tabelas. É a **única fonte dos tempos oficiais** (rodada 1).
+  - `resultados/bst_resultados.csv` e `resultados/avl_resultados.csv`: saída dos programas, que a cada execução sobrescreve o arquivo anterior. Os CSVs presentes no repositório correspondem à **rodada 2** (complementar). Por isso, os tempos deles diferem dos oficiais, enquanto comparações, alturas, rotações e contagens são idênticas nas duas rodadas.
 
-### Resultados oficiais
+### Resultados oficiais (rodada 1)
 
 **Cenário 1 (A): inserção em ordem aleatória**
 
@@ -277,12 +294,12 @@ Houve 0 buscas inesperadas e 0 remoções inesperadas, e a validação foi OK em
 
 | Árvore | Fase | Inseridas | Rejeitadas | Tamanho final | Comparações | Altura |
 |---|---|---:|---:|---:|---:|---:|
-| BST | copias_exatas | `<preencher>` | `<preencher>` | `<preencher>` | 9.743 | 39 |
-| BST | chaves_distintas | `<preencher>` | `<preencher>` | `<preencher>` | 21.150 | 39 |
-| AVL | copias_exatas | `<preencher>` | `<preencher>` | `<preencher>` | 7.459 | 18 |
-| AVL | chaves_distintas | `<preencher>` | `<preencher>` | `<preencher>` | 16.123 | 18 |
+| BST | copias_exatas | 0 | 500 | 50.000 | 9.743 | 39 |
+| BST | chaves_distintas | 1.000 | 0 | 51.000 | 21.150 | 39 |
+| AVL | copias_exatas | 0 | 500 | 50.000 | 7.459 | 18 |
+| AVL | chaves_distintas | 1.000 | 0 | 51.000 | 16.123 | 18 |
 
-As cópias exatas foram rejeitadas sem criar nó (o tamanho final não mudou), e os registros com a mesma combinação (`scientificName`, `year`) e `gbifID` diferente foram aceitos. Na AVL, a contagem de rotações é acumulada: em `copias_exatas` ela ficou em 34.861, igual à da inserção do cenário 1, ou seja, as cópias rejeitadas não provocaram nenhuma rotação. Em `chaves_distintas` ela subiu para 35.714 (853 rotações a mais).
+As 500 cópias exatas (1% dos 50.000 registros) foram rejeitadas sem criar nó, e o tamanho final continuou em 50.000. Os 1.000 registros com a mesma combinação (`scientificName`, `year`) e `gbifID` diferente foram aceitos, e o tamanho final passou para 51.000. Na AVL, a contagem de rotações é acumulada: em `copias_exatas` ela ficou em 34.861, igual à da inserção do cenário 1, ou seja, as cópias rejeitadas não provocaram nenhuma rotação. Em `chaves_distintas` ela subiu para 35.714 (853 rotações a mais).
 
 **Verificações automáticas:** 327 na BST e 416 na AVL, com 0 falhas em ambas.
 
@@ -296,28 +313,50 @@ As cópias exatas foram rejeitadas sem criar nó (o tamanho final não mudou), e
 
 **Alturas.** Em 879.726 registros, log₂ n ≈ 19,75. A AVL aleatória ficou em 23, dentro do limite de 1,44·log₂ n ≈ 28,4. A BST aleatória ficou em 49 (≈2,5·log₂ n), dentro da faixa esperada de 2 a 3 vezes log₂ n. Já a BST ordenada degenera, com altura de n−1.
 
-**Tempo.** A AVL foi mais rápida que a BST no cenário aleatório (1,08 s contra 1,61 s em 879.726), apesar de executar 613.706 rotações. Uma explicação plausível é que o custo dominante é a comparação de strings (`scientificName`), e a AVL faz menos comparações; porém isso não foi medido separadamente. Na AVL, a inserção ordenada (0,20 s) foi ≈5× mais rápida que a aleatória (1,08 s) com número de comparações semelhante. Uma hipótese é a melhor localidade de cache no acesso sequencial, que também não foi testada.
+**Tempo.** Na rodada oficial, a AVL foi mais rápida que a BST no cenário aleatório (1,08 s contra 1,61 s em 879.726), apesar de executar 613.706 rotações. Uma explicação plausível é que o custo dominante é a comparação de strings (`scientificName`), e a AVL faz menos comparações; porém isso não foi medido separadamente. Na AVL, a inserção ordenada (0,20 s) foi ≈5× mais rápida que a aleatória (1,08 s) com número de comparações semelhante. Uma hipótese é a melhor localidade de cache no acesso sequencial, que também não foi testada.
 
 **Resolução do relógio.** Tempos iguais a 0,000 s indicam valores abaixo da resolução do `clock()` (≈1 ms) e não tempo zero. Como a mediana de 4 valores é a média dos dois centrais, os tempos variam em passos de 0,5 ms.
 
-### Experimento extra: sensibilidade ao ruído
+### Experimento complementar: sensibilidade ao ambiente (rodada 2)
 
-Para avaliar a influência de outros programas, repetimos as execuções com o computador ligado há algum tempo e **renderizando um vídeo** (03/11/2026, 15:15 e 15:31). Esta rodada **não faz parte dos resultados oficiais**, pois viola a condição da seção 3.1.
+Para avaliar a influência de outros programas em execução sobre os tempos medidos, foi realizada uma segunda rodada completa de testes em 03/11/2026. Nessa rodada, o computador já estava ligado havia algum tempo e o **DaVinci Resolve estava renderizando um vídeo**. Os testes da BST foram executados às **15:15**, enquanto os testes da AVL foram executados às **15:31**.
 
-- **Comparações, alturas e rotações foram idênticas** às da rodada oficial em todas as fases. Isso confirma que são determinísticos (mesma semente, mesmos dados) e não dependem da máquina.
-- **Os tempos aumentaram de ≈1,2× a ≈4,7×.** Por exemplo, na inserção aleatória com 879.726 registros, a BST passou de 1,61 s para 5,56 s e a AVL de 1,08 s para 4,26 s. Já o cenário 2 da BST (43,57 s → 52,96 s) variou só ≈1,2×.
-- **A ordem entre as estruturas se manteve** no cenário aleatório (AVL mais rápida que a BST), mas os valores absolutos dependem muito do estado da máquina.
+Essa rodada teve caráter exclusivamente complementar e **não substituiu os resultados oficiais**, pois as condições de execução foram diferentes das estabelecidas na seção 3.1. Os resultados foram utilizados para observar a sensibilidade dos tempos de execução ao ambiente da máquina.
 
-Conclusão: comparações, alturas e rotações são as medidas robustas; o tempo só é comparável entre execuções feitas nas mesmas condições.
+**Comparação dos tempos no cenário A — inserção em ordem aleatória (879.726 registros):**
+
+| Estrutura | Rodada oficial | Rodada com vídeo | Aumento |
+|---|---:|---:|---:|
+| BST | 1,6055 s | 5,5620 s | 3,5× |
+| AVL | 1,0845 s | 4,2610 s | 3,9× |
+
+Os resultados mostram que os tempos de execução aumentaram consideravelmente na segunda rodada, mesmo com as mesmas entradas e configurações de teste.
+
+As comparações, alturas, rotações e contagens de inserções, rejeições e remoções permaneceram idênticas às da rodada oficial. Isso demonstra que essas métricas não foram afetadas pelo estado da máquina nas condições testadas.
+
+Portanto, os resultados da segunda rodada reforçam a importância de manter condições controladas durante as medições de desempenho. Por esse motivo, a comparação principal entre BST e AVL neste trabalho utiliza exclusivamente os resultados da rodada oficial.
+
+O que foi observado:
+
+- **Comparações, alturas, rotações e contagens de inserções, rejeições e remoções foram idênticas** às da rodada oficial em todas as fases. Isso confirma que são determinísticas (mesma semente, mesmos dados) e não dependem do estado da máquina.
+- **Os tempos aumentaram de ≈1,2× a ≈7×**, considerando as fases com tempo oficial de pelo menos 10 ms (abaixo disso a resolução do relógio impede a comparação). O menor aumento foi o da BST no cenário 2 e no cenário 3 (≈1,2×) e o maior foi o da AVL na busca de todas as chaves com n = 50.000 (de 0,023 s para 0,162 s).
+- **A ordem de desempenho entre as estruturas dependeu do cenário e do estado da máquina.** Dividindo o tempo da AVL pelo da BST (valores menores que 1 indicam AVL mais rápida):
+  - na inserção aleatória (cenário 1), a AVL foi mais rápida nas duas rodadas (0,63 a 0,74 na rodada 1; 0,62 a 0,82 na rodada 2);
+  - na busca de todas as chaves do cenário 1, a vantagem da AVL (0,71 a 0,80 na rodada 1) praticamente desapareceu na rodada 2 (0,90 a 1,05), com a AVL ligeiramente mais lenta em n = 50.000 e n = 500.000;
+  - no cenário 3, a AVL foi mais rápida na rodada 1 (0,74 a 0,84) e **mais lenta** na rodada 2 (2,70 a 3,09), embora o número de comparações fosse o mesmo. Os dados não permitem explicar essa inversão e ela não foi investigada; tomada isoladamente, a rodada 2 não é uma base confiável para comparar o tempo das duas árvores.
+
+Conclusão: comparações, alturas e rotações são as medidas robustas; o tempo só é comparável entre execuções feitas nas mesmas condições, e por isso a comparação entre BST e AVL neste trabalho se apoia nos resultados oficiais.
 
 ### Limitações
 
-- O tempo é o tempo decorrido (relógio de parede) medido com `clock()`, com resolução de ≈1 ms, e é sensível a outros processos.
-- No cenário 2, a BST foi testada apenas com 50.000 registros, por causa do custo O(n²); o tempo para tamanhos maiores é extrapolado.
-- Não foi medido o uso de memória nem foram separados os custos de comparação de strings e de manipulação de ponteiros; as explicações de tempo são hipóteses.
-- O dataset é um subconjunto do GBIF (grupo Fungi), e os resultados podem diferir com outra distribuição de nomes e anos.
+- O tempo de execução foi medido com `clock()`, com resolução de aproximadamente 1 ms, sendo sensível à execução de outros processos, como demonstrado na rodada 2.
+- Foi realizada uma única rodada oficial e uma rodada complementar. Portanto, os tempos oficiais possuem repetições dentro de uma mesma sessão, mas não foram comparados entre diferentes sessões oficiais.
+- No cenário 2, a BST foi testada apenas com 50.000 registros devido ao custo computacional O(n²) da inserção ordenada. Os tempos para tamanhos maiores foram estimados por extrapolação, e não medidos diretamente.
+- Não foram realizadas medições de uso de memória nem separados os custos das comparações de strings e da manipulação de ponteiros. Portanto, as explicações sobre as diferenças de tempo entre as estruturas são hipóteses.
+- O dataset completo utilizado nos experimentos é um subconjunto de dados do GBIF, referente ao grupo Fungi, com registros da Finlândia, Noruega e Dinamarca, entre 2020 e 2022. Os resultados podem variar com outras distribuições de nomes científicos e anos.
+- O repositório disponibiliza apenas uma amostra de demonstração, com aproximadamente 385 registros. Dessa forma, executar os programas diretamente com os dados disponíveis no GitHub **não reproduz os resultados apresentados neste relatório**, que foram obtidos com 879.726 registros. Para reproduzir os experimentos, é necessário gerar o dataset completo diretamente no GBIF, utilizando os mesmos filtros de seleção descritos na seção 4.1.
 
-Os arquivos de resultados estão na pasta /resultados.
+Os arquivos de resultados estão disponíveis na pasta `resultados/`.
 
 ---
 
@@ -331,7 +370,8 @@ Os arquivos de resultados estão na pasta /resultados.
 * Dependências: apenas a biblioteca padrão de C.
 * Sistema operacional testado: Windows 11.
 * Hardware usado nos testes: Intel Core i7-13650HX, 16 GB DDR5, NVIDIA GeForce RTX 3050 6GB Laptop GPU (a GPU não é usada pelo programa).
-* Dataset: dataset/ocorrencias.csv, com 879.726 registros válidos extraídos do GBIF (grupo Fungi) já incluído no repositório.
+* Dataset de demonstração (incluído no repositório): `dataset/ocorrencias.csv`, com aproximadamente 385 registros de fungos (grupo Fungi) do GBIF, filtrados para a Islândia em 2021. É uma amostra pequena, disponibilizada apenas para que qualquer pessoa possa clonar o repositório e executar os programas sem baixar o dataset completo. **Os resultados de desempenho deste README não foram obtidos com ela.**
+* Dataset completo (não incluído no repositório): `dataset/ocorrencias.csv` com 879.726 registros válidos de fungos (grupo Fungi) do GBIF, filtrados para Finlândia, Noruega e Dinamarca no período de 2020 a 2022. Esse arquivo ficou disponível apenas localmente e foi o utilizado em todas as medições da seção 3.5. Para reproduzir os resultados, é preciso gerá-lo no GBIF com os mesmos filtros e colocá-lo em `dataset/` no lugar da amostra.
 
 ---
 
@@ -394,10 +434,10 @@ Fungos-das--rvores-C/
 ├── testes/
 │   ├── teste_bst.c
 │   ├── teste_avl.c
-│   ├── teste_comum.c / .h
+│   ├── teste_comum.c / teste_comum.h
 │
 ├── dataset/
-│   └── ocorrencias.csv
+│   └── ocorrencias.csv(CSV menor)
 │
 ├── resultados/
 │   ├── bst_resultados.csv
@@ -407,6 +447,27 @@ Fungos-das--rvores-C/
 ├── .gitignore
 └── README.md
 ```
+
+---
+## 4.4 Configuração do ambiente
+Vídeo demonstrando como configurar o ambiente e executar os comandos necessários.
+
+https://github.com/user-attachments/assets/d8a3bdb7-eb87-4b8a-997c-73f51a037b72
+
+---
+### 4.5 Execução dos testes da BST
+Vídeo curto mostrando a execução dos testes da Árvore Binária de Busca (BST).
+
+https://github.com/user-attachments/assets/a70f498f-ef7e-4a14-8b19-4c72b47b6bec
+
+
+---
+
+## 4.6 Execução dos testes da AVL
+Vídeo curto mostrando a execução dos testes da Árvore AVL.
+
+
+https://github.com/user-attachments/assets/5c67018b-4fb4-4eb0-9b59-a852473c5d05
 
 ---
 
@@ -424,4 +485,8 @@ Fungos-das--rvores-C/
 
 > 🍄 **Fungos das Árvores-C**
 > Trabalho desenvolvido para a disciplina de **Estruturas de Dados II — UNICID**.
+
+
+
+
 
