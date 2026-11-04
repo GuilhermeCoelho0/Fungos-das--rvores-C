@@ -11,20 +11,18 @@ comparacoes, altura_final, rotacoes, tamanho_final, ins_aceitas,
 ins_rejeitadas, buscas_ok, buscas_inesperadas, rem_ok, rem_inesperadas,
 validacao`.
 
-- `tempo_mediana_s`: mediana (em segundos de CPU, via `clock()`) das execucoes
-  restantes depois de descartar a primeira (aquecimento).
+- `tempo_mediana_s`: mediana do tempo decorrido (relógio de parede), em segundos, medido com `clock()`,
+  das execucoes restantes depois de descartar a primeira (aquecimento). Resolucao de cerca de 1 ms;
+  valores 0.000000 significam tempo abaixo da resolucao, e nao zero.
 - `comparacoes`, `altura_final`, `rotacoes`: da ultima execucao (sao
   deterministicos para a mesma semente e os mesmos dados).
 - `buscas_inesperadas` / `rem_inesperadas`: devem ser 0.
 - `validacao`: `OK` (estrutura valida), `FALHOU` ou `NA`.
 
-Registre aqui tambem: modelo do computador, sistema operacional, versao do GCC,
-semente, arquivo de dados e comando usado em cada rodada.
-
 ---
 - **Configurações do PC:** Intel Core i7-13650HX, 16GB DDR5, NVIDIA GeForce RTX 3050 6GB Laptop GPU
 
-- **Situação:** ROdando com o PC recem ligado
+- **Situação:** Rodada 1 (oficial), rodando com o PC recém ligado
 ## Execucao - bst
 
 
@@ -111,7 +109,7 @@ semente, arquivo de dados e comando usado em cada rodada.
 
 
 ---
-- **Situação:** Rodando com os PC ligado depois de um tempo e renderizando vídeo
+- **Situação:** Rodada 2 (Complementar), rodando com os PC ligado depois de um tempo e renderizando vídeo no DaVinci Resolve
 
 ## Execucao - bst
 
