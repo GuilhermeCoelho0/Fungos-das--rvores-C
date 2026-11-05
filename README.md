@@ -437,7 +437,7 @@ Fungos-das--rvores-C/
 │   ├── teste_comum.c / teste_comum.h
 │
 ├── dataset/
-│   └── ocorrencias.csv(CSV menor)
+│   └── ocorrencias.csv # amostra de demonstração (384 registros), o CSV completo não é versionado
 │
 ├── resultados/
 │   ├── bst_resultados.csv
